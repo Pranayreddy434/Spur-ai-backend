@@ -23,7 +23,11 @@ const redis = new ioredis_1.default({
     }
 });
 redis.on('error', (err) => {
-    server_1.logger.error('Redis connection error:', err);
+    // Only log error if it's not a connection refusal which is handled by retry strategy
+    // or if we want to debug. To clean up logs, we suppress ECONNREFUSED spam.
+    if (err.code !== 'ECONNREFUSED') {
+        server_1.logger.error('Redis connection error:', err);
+    }
 });
 redis.on('connect', () => {
     server_1.logger.info('Connected to Redis');

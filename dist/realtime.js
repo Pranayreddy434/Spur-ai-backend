@@ -17,14 +17,18 @@ function setupRealtime(server) {
     io.on("connection", async (socket) => {
         server_1.logger.info(`User connected: ${socket.id}`);
         // Track online users in Redis
-        await redis_1.default.sadd("online_users", socket.id);
-        const count = await redis_1.default.scard("online_users");
-        io.emit("online_count", count);
+        if (redis_1.default.status === 'ready') {
+            await redis_1.default.sadd("online_users", socket.id);
+            const count = await redis_1.default.scard("online_users");
+            io.emit("online_count", count);
+        }
         socket.on("disconnect", async () => {
             server_1.logger.info(`User disconnected: ${socket.id}`);
-            await redis_1.default.srem("online_users", socket.id);
-            const newCount = await redis_1.default.scard("online_users");
-            io.emit("online_count", newCount);
+            if (redis_1.default.status === 'ready') {
+                await redis_1.default.srem("online_users", socket.id);
+                const newCount = await redis_1.default.scard("online_users");
+                io.emit("online_count", newCount);
+            }
         });
     });
     return io;
