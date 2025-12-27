@@ -1,0 +1,14 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const chat_1 = require("../controllers/chat");
+const upload_1 = require("../services/upload");
+const router = (0, express_1.Router)();
+router.post("/message", chat_1.handleChatMessage);
+router.post("/stream", upload_1.upload.single("file"), chat_1.handleStreamingChatMessage);
+router.get("/history/:sessionId", chat_1.getChatHistory);
+router.get("/conversations", chat_1.listConversations);
+router.get("/search/:q", chat_1.searchMessages);
+router.get("/export/:id", chat_1.exportConversation);
+router.delete("/conversation/:sessionId", chat_1.deleteConversation);
+exports.default = router;
